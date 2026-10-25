@@ -79,13 +79,28 @@ ARを活用することで、現実のテーブルをゲームの舞台として
 
 #### 平面検出とステージ配置
 
-<!-- ![Images/StagePlacement.png](Images/StagePlacement.png) -->
+<table>
+  <tr>
+    <td align="center">
+      <img src="Documents/Images/ss_nonetable.jpg" width="240" alt="平面検出">
+      <br>
+      机のスキャン
+    </td>
+    <td align="center">
+      <img src="Documents/Images/ss_plane.jpg" width="240" alt="ステージ配置">
+      <br>
+      平面の自動検出
+    </td>
+    <td align="center">
+      <img src="Documents/Images/ss_board.jpg" width="240" alt="画像認識">
+      <br>
+      タッチした任意地点にステージ(仮)を設置
+    </td>
+  </tr>
+</table>
+
 
 現実空間の平面を検出し、その位置にステージを配置する機能を実装しました。
-
-<!-- ![Images/PlaneDetection.png](Images/PlaneDetection.png) -->
-
-平面検出時の表示と、ステージ配置後の表示を比較できるようにしています。
 
 #### 画像認識と座標の相対化
 
