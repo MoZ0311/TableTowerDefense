@@ -94,7 +94,7 @@ ARを活用することで、現実のテーブルをゲームの舞台として
     <td align="center">
       <img src="Documents/Images/ss_board.jpg" width="240" alt="画像認識">
       <br>
-      タッチした平面上にステージ(仮)を設置
+      タッチした場所にステージ(仮)を設置
     </td>
   </tr>
 </table>
