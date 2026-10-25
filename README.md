@@ -2,7 +2,7 @@
 
 **AR技術を活用し、身近なテーブルを戦場に変えるタワーディフェンスゲーム**
 
-<!-- [ここにステージ設置後の実際のスクリーンショットを掲載] -->
+![proposal.jpg](TableTowerDefense_docs/Images/proposal.jpg)
 
 ## 1. 作品概要
 
