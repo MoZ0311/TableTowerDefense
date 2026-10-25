@@ -94,7 +94,7 @@ ARを活用することで、現実のテーブルをゲームの舞台として
     <td align="center">
       <img src="Documents/Images/ss_board.jpg" width="240" alt="画像認識">
       <br>
-      タッチした任意地点にステージ(仮)を設置
+      タッチした平面上にステージ(仮)を設置
     </td>
   </tr>
 </table>
@@ -104,9 +104,17 @@ ARを活用することで、現実のテーブルをゲームの舞台として
 
 #### 画像認識と座標の相対化
 
-<!-- ![Images/ImageRecognition.png](Images/ImageRecognition.png) -->
-
 画像認識と座標の相対化についても個別に実装し、動作を検証しています。
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="Documents/Images/card.png" width="128" alt="カード">
+      <br>
+      画像認識に使用するARマーカー
+    </td>
+  </tr>
+</table>
 
 今後は、これらの機能を組み合わせ、複数端末から同じゲーム空間を扱える構成を目指します。
 
