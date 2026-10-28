@@ -6,8 +6,14 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/BootScene.unity
+    guid: 836d68c9a1a375147811a0f76992473d
+  - enabled: 1
     path: Assets/Scenes/PlaneDetection.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/ImageTracking.unity
+    guid: b920c0af99d39bc459ee96cfc69e8f7d
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 0c80ce71cb04a0c42ab6d985553ac7e8, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
