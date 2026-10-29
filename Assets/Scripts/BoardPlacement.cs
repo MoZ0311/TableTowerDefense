@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class BoardPlacement : MonoBehaviour
 {
-    [SerializeField] ARPlaneManager planeManager;
+    [SerializeField] BoardManager boardManager;
     [SerializeField] ARRaycastManager raycastManager;
     [SerializeField] GameObject boardPrefab;
 
@@ -33,24 +33,9 @@ public class BoardPlacement : MonoBehaviour
                 // Hitした場合、そこにBoardプレハブを作成
                 Pose hitPose = raycastHits[0].pose;
                 placedBoard = Instantiate(boardPrefab, hitPose.position, hitPose.rotation);
-
-                // 平面検出機能をオフにする
-                planeManager.enabled = false;
-
-                // 検出平面を一括で隠す
-                DisablePlanes();
             }
-        }
-    }
 
-
-
-
-    void DisablePlanes()
-    {
-        foreach (ARPlane plane in planeManager.trackables)
-        {
-            plane.gameObject.SetActive(false);
+            boardManager.DisableARPlaneManager();
         }
     }
 }
