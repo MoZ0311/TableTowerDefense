@@ -1,10 +1,13 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Resources/UI%20Style.uss?fileID=7433441132597879392&amp;guid=8489a72aeaefa5242b4771c861ad0af3&amp;type=3#UI Style"/>
     <ui:VisualElement style="flex-grow: 1; background-color: rgb(197, 228, 185);">
-        <ui:VisualElement style="background-image: url(&quot;project://database/Assets/Images/logo.png?fileID=2800000&amp;guid=c19a836c972970749a7c4f5e97efc953&amp;type=3#logo&quot;); aspect-ratio: 1.67; top: 64px;"/>
-        <ui:VisualElement style="align-items: center;">
+        <ui:VisualElement style="flex-grow: 1; margin-top: 256px; padding-left: 0; margin-left: 40px; margin-right: 40px;">
+            <ui:VisualElement style="background-image: url(&quot;project://database/Assets/Images/logo.png?fileID=2800000&amp;guid=c19a836c972970749a7c4f5e97efc953&amp;type=3#logo&quot;); aspect-ratio: 1.67;"/>
+        </ui:VisualElement>
+        <ui:VisualElement style="align-items: center; flex-grow: 1;">
             <ui:Button text="Plane Detection" name="plane"/>
             <ui:Button text="Image Tracking" name="image"/>
+            <ui:Button text="Table Bounding" name="bounding"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
