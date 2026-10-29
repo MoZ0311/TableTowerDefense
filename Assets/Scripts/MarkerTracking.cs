@@ -50,13 +50,9 @@ public class MarkerTracking : MonoBehaviour
 
             // Plane非表示
             // boardManager.DisableARPlaneManager();
-
-            Debug.Log("");
         }
 
         UpdateBoardPose(image.transform);
-
-        LogDetectedPlanes();
     }
 
     void UpdateBoardPose(Transform targetTransform)
@@ -70,23 +66,5 @@ public class MarkerTracking : MonoBehaviour
             targetTransform.position,
             targetTransform.rotation
         );
-    }
-
-    void LogDetectedPlanes()
-    {
-        foreach (ARPlane plane in planeManager.trackables)
-    {
-        if (plane.alignment != PlaneAlignment.HorizontalUp)
-        {
-            continue;
-        }
-
-        Debug.Log(
-            $"Plane ID: {plane.trackableId}, " +
-            $"Position: {plane.transform.position}, " +
-            $"Normal: {plane.transform.up}, " +
-            $"Boundary Points: {plane.boundary.Length}"
-        );
-    }
     }
 }
