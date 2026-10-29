@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 /// </summary>
 public class BootUIManager : MonoBehaviour
 {
+    [Header("Components")]
     [SerializeField] UIDocument bootUI;
 
     Button planeDetection;  // PlaneDetection Scene遷移用のボタン

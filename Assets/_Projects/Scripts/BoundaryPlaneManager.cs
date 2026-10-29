@@ -4,6 +4,7 @@ using Unity.Collections;
 
 public class BoundaryPlaneManager : MonoBehaviour
 {
+    [Header("Components")]
     [SerializeField] ARPlaneManager planeManager;
     [SerializeField] LineRenderer fixedBoundaryLine;
 

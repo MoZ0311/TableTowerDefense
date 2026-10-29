@@ -7,7 +7,10 @@ using UnityEngine.XR.ARSubsystems;
 /// </summary>
 public class MarkerTracking : MonoBehaviour
 {
+    [Header("Components")]
     [SerializeField] ARTrackedImageManager trackedImageManager;
+
+    [Header("Prefabs")]
     [SerializeField] GameObject trackedImagePrefab; // マーカー検出時に生成するPrefab
 
     Transform prefabTransform;                      // 生成したPrefabのTransform情報

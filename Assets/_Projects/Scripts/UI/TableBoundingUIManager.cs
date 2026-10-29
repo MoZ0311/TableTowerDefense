@@ -6,9 +6,10 @@ using UnityEngine.UIElements;
 /// </summary>
 public class TableBoundingUIManager : MonoBehaviour
 {
+    [Header("Components")]
     [SerializeField] UIDocument tableBoundingUI;
 
-    Button finalizeButton;
+    Button finalizeButton;  // 平面検出終了用のボタン
 
     void OnEnable()
     {

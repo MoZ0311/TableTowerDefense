@@ -9,7 +9,10 @@ using System.Collections.Generic;
 /// </summary>
 public class PrefabPlacement : MonoBehaviour
 {
+    [Header("Components")]
     [SerializeField] ARRaycastManager raycastManager;
+
+    [Header("Prefabs")]
     [SerializeField] GameObject placementPrefab;            // 生成するPrefab
 
     static readonly List<ARRaycastHit> raycastHits = new(); // AR空間でのRaycastを格納するList
@@ -50,6 +53,8 @@ public class PrefabPlacement : MonoBehaviour
                 // Hitした場合、そこにBoardプレハブを作成
                 Pose hitPose = raycastHits[0].pose;
                 prefabTransform = Instantiate(placementPrefab, hitPose.position, hitPose.rotation).transform;
+
+                ARPlaneUtility.DisableManagerAndPlanes();
             }
         }
     }
