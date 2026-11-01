@@ -22,14 +22,50 @@ public class BootUIManager : MonoBehaviour
         imageTracking = root.Q<Button>("image");
         tableBounding = root.Q<Button>("bounding");
 
+        // イベント登録
+        AddEvent();
+    }
+
+    void OnDisable()
+    {
+        // イベント解除
+        RemoveEvent();
+    }
+
+    /// <summary>
+    /// イベントの登録処理
+    /// </summary>
+    void AddEvent()
+    {
+        // 各VisualElementのnullチェック
+        if (planeDetection == null ||
+            imageTracking == null ||
+            tableBounding == null)
+        {
+            Debug.LogError("VisualElement is null");
+            return;
+        }
+
         // クリック時イベントの登録
         planeDetection.clicked += OnClickedPlaneDetection;
         imageTracking.clicked += OnClickedImageTrancking;
         tableBounding.clicked += OnClickedTableBounding;
     }
 
-    void OnDisable()
+    /// <summary>
+    /// イベントの解除処理
+    /// </summary>
+    void RemoveEvent()
     {
+        // 各VisualElementのnullチェック
+        if (planeDetection == null ||
+            imageTracking == null ||
+            tableBounding == null)
+        {
+            Debug.LogError("VisualElement is null");
+            return;
+        }
+
         // クリック時イベントの解除
         planeDetection.clicked -= OnClickedPlaneDetection;
         imageTracking.clicked -= OnClickedImageTrancking;

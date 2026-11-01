@@ -11,6 +11,7 @@ public class PrefabPlacement : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] ARRaycastManager raycastManager;
+    [SerializeField] ARPlaneManager planeManager;
 
     [Header("Prefabs")]
     [SerializeField] GameObject placementPrefab;            // 生成するPrefab
@@ -54,7 +55,7 @@ public class PrefabPlacement : MonoBehaviour
                 Pose hitPose = raycastHits[0].pose;
                 prefabTransform = Instantiate(placementPrefab, hitPose.position, hitPose.rotation).transform;
 
-                ARPlaneUtility.DisableManagerAndPlanes();
+                ARPlaneUtility.StopDetectionAndHidePlanes(planeManager);
             }
         }
     }

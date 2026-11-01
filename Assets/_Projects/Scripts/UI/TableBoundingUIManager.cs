@@ -17,12 +17,44 @@ public class TableBoundingUIManager : MonoBehaviour
         var root = tableBoundingUI.rootVisualElement;
         finalizeButton = root.Q<Button>();
 
-        // クリック時イベントの登録
-        finalizeButton.clicked += OnClickedFinalize;
+        // イベント登録
+        AddEvent();
     }
 
     void OnDisable()
     {
+        // イベント解除
+        RemoveEvent();
+    }
+
+    /// <summary>
+    /// イベントの登録処理
+    /// </summary>
+    void AddEvent()
+    {
+        // 各VisualElementのnullチェック
+        if (finalizeButton == null)
+        {
+            Debug.LogError("VisualElement is null");
+            return;
+        }
+
+        // クリック時イベントの登録
+        finalizeButton.clicked += OnClickedFinalize;
+    }
+
+    /// <summary>
+    /// イベントの解除処理
+    /// </summary>
+    void RemoveEvent()
+    {
+        // 各VisualElementのnullチェック
+        if (finalizeButton == null)
+        {
+            Debug.LogError("VisualElement is null");
+            return;
+        }
+
         // クリック時イベントの解除
         finalizeButton.clicked -= OnClickedFinalize;
     }

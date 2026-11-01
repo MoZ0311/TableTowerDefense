@@ -154,7 +154,7 @@ MonoBehaviour:
   m_OriginBaseGameObject: {fileID: 35221151}
   m_CameraFloorOffsetObject: {fileID: 178825591}
   m_RequestedTrackingOriginMode: 0
-  m_CameraYOffset: 1.1176
+  m_CameraYOffset: 0
 --- !u!4 &35221153
 Transform:
   m_ObjectHideFlags: 0
@@ -620,6 +620,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoardPlacement
   raycastManager: {fileID: 35221154}
+  planeManager: {fileID: 35221155}
   placementPrefab: {fileID: 8688713365434984657, guid: e3549b2823849bb48817093137207d71, type: 3}
 --- !u!1 &1964602097
 GameObject:
