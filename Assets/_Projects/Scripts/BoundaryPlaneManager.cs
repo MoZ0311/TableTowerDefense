@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
-using Unity.Collections;
+using UnityEngine.XR.ARSubsystems;
 
 public class BoundaryPlaneManager : MonoBehaviour
 {
@@ -8,111 +8,148 @@ public class BoundaryPlaneManager : MonoBehaviour
     [SerializeField] ARPlaneManager planeManager;
     [SerializeField] LineRenderer fixedBoundaryLine;
 
-    ARPlane selectedPlane;
-    Transform boardRoot;
+    [Header("Settings")]
+    [SerializeField] float maxPlaneDistance;
 
-    Vector3[] fixedBoundary;
-    bool isFinalized;
+    Transform markerTransform;  // 認識したマーカーのTransform情報
+    ARPlane selectedPlane;      // 描画対象である、マーカーを内包するPlane
 
-    public bool IsFinalized => isFinalized;
-    public Vector3[] FixedBoundary => fixedBoundary;
-
-    // MarkerTracking から、現在の候補平面と BoardRoot を受け取る
-    public void SetCandidatePlane(ARPlane plane, Transform boardTransform)
+    void Start()
     {
-        if (isFinalized || plane == null || boardTransform == null)
-        {
-            return;
-        }
+        fixedBoundaryLine.enabled = false;
+    }
 
-        selectedPlane = plane;
-        boardRoot = boardTransform;
+    /// <summary>
+    /// マーカーのTransformを設定する処理
+    /// </summary>
+    /// <param name="targetTransform">マーカーのTransform</param>
+    public void SetMarkerTransform(Transform targetTransform)
+    {
+        markerTransform = targetTransform;
+        UpdateSelectedPlane();
+    }
 
+    /// <summary>
+    /// 最適な平面(マーカーに近い平面)の更新処理
+    /// </summary>
+    void UpdateSelectedPlane()
+    {
+        selectedPlane = FindCandidatePlane();
         UpdatePlaneVisibility();
     }
 
     /// <summary>
-    /// 選択した平面だけを描画する処理
+    /// マーカーを内包する最適なPlaneを見つける処理
     /// </summary>
-    void UpdatePlaneVisibility()
+    /// <returns>マーカーを内包するARPlane</returns>
+    ARPlane FindCandidatePlane()
     {
-        foreach (ARPlane plane in planeManager.trackables)
+        // nullチェック
+        if (planeManager == null || markerTransform == null)
         {
-            bool shouldEnable = plane == selectedPlane;
-            plane.gameObject.SetActive(shouldEnable);
+            Debug.LogError("planeManager is null");
+            return null;
         }
+
+        ARPlane bestPlane = null;
+        float bestDistance = float.MaxValue;
+
+        foreach (var plane in planeManager.trackables)
+        {
+            // 平面が水平上向きでなければ、continue
+            if (plane.alignment != PlaneAlignment.HorizontalUp)
+            {
+                continue;
+            }
+
+            // ARPlaneの座標を、マーカー座標を基準に計算
+            Vector3 localPosition = plane.transform.InverseTransformPoint(markerTransform.position);
+
+            // 平面の高さの差(y方向の距離)を絶対値で取得
+            float distance = Mathf.Abs(localPosition.y);
+
+            // 距離が閾値を超えていればcontinue
+            if (distance > maxPlaneDistance)
+            {
+                continue;
+            }
+
+            // マーカーを内包するかチェックし、不適であればcontinue
+            Vector2 planePoint = new(localPosition.x, localPosition.z);
+            if (!IsInsideBoundary(plane, planePoint))
+            {
+                continue;
+            }
+
+            // より近いPlaneがあれば、更新
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestPlane = plane;
+            }
+        }
+
+        return bestPlane;
     }
 
     /// <summary>
-    /// ステージ外形の確定処理
+    /// 指定位置がPlaneの境界内にあるか判定する処理
     /// </summary>
-    public void FinalizeStage()
+    /// <param name="plane">検査対象のPlane</param>
+    /// <param name="point"></param>
+    /// <returns>指定位置がPlaneの境界内にあるか</returns>
+    bool IsInsideBoundary(ARPlane plane, Vector2 point)
     {
-        if (isFinalized)
+        // 境界の頂点が3つ未満であれば、面を構成出来ない
+        var boundary = plane.boundary;
+        if (boundary.Length < 3)
         {
-            return;
+            return false;
         }
 
-        if (selectedPlane == null || boardRoot == null)
+        bool isInside = false;
+
+        for (int i = 0, j = boundary.Length - 1;
+             i < boundary.Length;
+             j = i++)
         {
-            Debug.LogWarning("ステージ確定できません。マーカーと机の平面を認識してください。");
-            return;
+            Vector2 a = boundary[i];
+            Vector2 b = boundary[j];
+
+            bool crosses =
+                (a.y > point.y) != (b.y > point.y) &&
+                point.x <
+                (b.x - a.x) * (point.y - a.y) /
+                (b.y - a.y) + a.x;
+
+            if (crosses)
+            {
+                isInside = !isInside;
+            }
         }
 
-        NativeArray<Vector2> boundary = selectedPlane.boundary;
-
-        if (!boundary.IsCreated || boundary.Length < 3)
-        {
-            Debug.LogWarning("平面の境界がまだ十分に取得できていません。");
-            return;
-        }
-
-        // 境界を BoardRoot のローカル座標にコピーする
-        fixedBoundary = new Vector3[boundary.Length];
-
-        for (int i = 0; i < boundary.Length; ++i)
-        {
-            Vector2 point = boundary[i];
-
-            Vector3 worldPoint = selectedPlane.transform.TransformPoint(new Vector3(point.x, 0f, point.y));
-
-            fixedBoundary[i] = boardRoot.InverseTransformPoint(worldPoint);
-        }
-
-        // 固定用 LineRenderer を設定する
-        DrawFixedBoundary();
-
-        // 境界の保存後に検出を終了する
-        isFinalized = true;
-
-        // 検出済み平面の描画を停止
-        foreach (ARPlane plane in planeManager.trackables)
-        {
-            plane.gameObject.SetActive(false);
-        }
-
-        planeManager.enabled = false;
-
-        Debug.Log($"ステージ確定完了。境界頂点数: {fixedBoundary.Length}");
+        return isInside;
     }
 
-    void DrawFixedBoundary()
+    /// <summary>
+    /// 選択中のPlaneだけ表示する処理
+    /// </summary>
+    void UpdatePlaneVisibility()
     {
-        if (fixedBoundaryLine == null || fixedBoundary == null)
+        // nullチェック
+        if (planeManager == null)
         {
-            Debug.LogWarning("固定境界用 LineRenderer が割り当てられていません。");
+            Debug.LogError("planeManager is null");
             return;
         }
 
-        fixedBoundaryLine.useWorldSpace = false;
-        fixedBoundaryLine.loop = true;
-        fixedBoundaryLine.positionCount = fixedBoundary.Length;
-
-        for (int i = 0; i < fixedBoundary.Length; i++)
+        foreach (ARPlane plane in planeManager.trackables)
         {
-            fixedBoundaryLine.SetPosition(i, fixedBoundary[i]);
+            // 表示用コンポーネントを、selectedPlaneとの比較で設定
+            if (plane.TryGetComponent<ARPlaneMeshVisualizer>(out var visualizer))
+            {
+                visualizer.enabled = plane == selectedPlane;
+            }
         }
-
-        fixedBoundaryLine.enabled = true;
     }
 }

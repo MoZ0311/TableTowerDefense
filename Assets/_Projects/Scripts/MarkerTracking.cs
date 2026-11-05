@@ -13,6 +13,9 @@ public class MarkerTracking : MonoBehaviour
     [Header("Prefabs")]
     [SerializeField] GameObject trackedImagePrefab; // マーカー検出時に生成するPrefab
 
+    [Header("Scripts")]
+    [SerializeField] BoundaryPlaneManager boundaryPlaneManager;
+
     Transform prefabTransform;                      // 生成したPrefabのTransform情報
 
     void OnEnable()
@@ -36,13 +39,30 @@ public class MarkerTracking : MonoBehaviour
         // 検出時
         foreach (var image in changes.added)
         {
-            SetPrefab(image);
+            UpdateMarker(image);
         }
 
         // 移動時
         foreach (var image in changes.updated)
         {
-            SetPrefab(image);
+            UpdateMarker(image);
+        }
+    }
+
+    /// <summary>
+    /// マーカー更新に伴う、平面の更新処理
+    /// </summary>
+    void UpdateMarker(ARTrackedImage image)
+    {
+        if (image.trackingState != TrackingState.Tracking)
+        {
+            return;
+        }
+
+        SetPrefab(image);
+        if (boundaryPlaneManager != null)
+        {
+            boundaryPlaneManager.SetMarkerTransform(image.transform);
         }
     }
 
