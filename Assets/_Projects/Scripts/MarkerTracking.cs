@@ -16,8 +16,7 @@ public class MarkerTracking : MonoBehaviour
     [Header("Root")]
     [SerializeField] Transform towerRoot;
 
-    [Header("Scripts")]
-    [SerializeField] BoundaryPlaneManager boundaryPlaneManager;
+    public Transform MarkerTransform { get; private set; }
 
     Transform prefabTransform;                      // 生成したPrefabのTransform情報
 
@@ -61,25 +60,8 @@ public class MarkerTracking : MonoBehaviour
     /// <summary>
     /// マーカー更新に伴う、平面の更新処理
     /// </summary>
+    /// /// <param name="image">検出されたマーカー情報</param>
     void UpdateMarker(ARTrackedImage image)
-    {
-        if (image.trackingState != TrackingState.Tracking)
-        {
-            return;
-        }
-
-        SetPrefab(image);
-        if (boundaryPlaneManager != null)
-        {
-            boundaryPlaneManager.SetMarkerTransform(image.transform);
-        }
-    }
-
-    /// <summary>
-    /// マーカーに対してPrefabを生成、追従させる処理
-    /// </summary>
-    /// <param name="image">検出されたマーカー</param>
-    void SetPrefab(ARTrackedImage image)
     {
         // マーカーの追跡中でなければ、return
         if (image.trackingState != TrackingState.Tracking)
@@ -87,6 +69,17 @@ public class MarkerTracking : MonoBehaviour
             return;
         }
 
+        MarkerTransform = image.transform;
+
+        SetPrefab(image.transform);
+    }
+
+    /// <summary>
+    /// マーカーに対してPrefabを生成、追従させる処理
+    /// </summary>
+    /// <param name="markerTransform">検出されたマーカーのTransform</param>
+    void SetPrefab(Transform markerTransform)
+    {
         // 一度も生成されていなければ、Prefabを生成
         if (prefabTransform == null)
         {
@@ -94,8 +87,8 @@ public class MarkerTracking : MonoBehaviour
         }
 
         prefabTransform.SetPositionAndRotation(
-            image.transform.position,
-            image.transform.rotation
+            markerTransform.position,
+            markerTransform.rotation
         );
     }
 }

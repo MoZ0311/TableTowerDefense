@@ -1,25 +1,19 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using System.Collections.Generic;
 
 public class BoundaryPlaneManager : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] ARPlaneManager planeManager;
-    [SerializeField] LineRenderer boundaryLine;
-
-    [Header("Root")]
-    [SerializeField] Transform boardRoot;
-    [SerializeField] Transform towerRoot;
 
     [Header("Settings")]
     [SerializeField] float maxPlaneDistance;
 
-    Transform markerTransform;  // 認識したマーカーのTransform情報
-    ARPlane selectedPlane;      // 描画対象である、マーカーを内包するPlane
+    [Header("Scripts")]
+    [SerializeField] MarkerTracking markerTracking;
 
-    readonly List<Vector3> boundaryPoints = new();   // BoardRootを基準としたステージ境界の頂点
+    public ARPlane SelectedPlane { get; private set; }  // マーカーを内包するPlane
 
     void OnEnable()
     {
@@ -41,27 +35,8 @@ public class BoundaryPlaneManager : MonoBehaviour
 
     void OnPlaneChanged(ARTrackablesChangedEventArgs<ARPlane> changes)
     {
-        UpdateSelectedPlane();
-    }
-
-    /// <summary>
-    /// マーカーのTransformを設定する処理
-    /// </summary>
-    /// <param name="targetTransform">マーカーのTransform</param>
-    public void SetMarkerTransform(Transform targetTransform)
-    {
-        markerTransform = targetTransform;
-        UpdateSelectedPlane();
-    }
-
-    /// <summary>
-    /// 最適な平面(マーカーに近い平面)の更新処理
-    /// </summary>
-    void UpdateSelectedPlane()
-    {
-        selectedPlane = FindCandidatePlane();
+        SelectedPlane = FindCandidatePlane();
         UpdatePlaneVisibility();
-        UpdateBoardRootPose();
     }
 
     /// <summary>
@@ -76,9 +51,8 @@ public class BoundaryPlaneManager : MonoBehaviour
             Debug.LogError("planeManager is null");
             return null;
         }
-        else if (markerTransform == null)
+        else if (markerTracking == null || markerTracking.MarkerTransform == null)
         {
-            Debug.LogWarning("markerTransform is null");
             return null;
         }
 
@@ -94,7 +68,7 @@ public class BoundaryPlaneManager : MonoBehaviour
             }
 
             // ARPlaneの座標を、マーカー座標を基準に計算
-            Vector3 localPosition = plane.transform.InverseTransformPoint(markerTransform.position);
+            Vector3 localPosition = plane.transform.InverseTransformPoint(markerTracking.MarkerTransform.position);
 
             // 平面の高さの差(y方向の距離)を絶対値で取得
             float distance = Mathf.Abs(localPosition.y);
@@ -179,127 +153,8 @@ public class BoundaryPlaneManager : MonoBehaviour
             // 表示用コンポーネントを、selectedPlaneとの比較で設定
             if (plane.TryGetComponent<ARPlaneMeshVisualizer>(out var visualizer))
             {
-                visualizer.enabled = plane == selectedPlane;
+                visualizer.enabled = plane == SelectedPlane;
             }
         }
-    }
-
-    /// <summary>
-    /// 選択中のPlaneに合わせてBoardRootの位置と回転を更新する
-    /// </summary>
-    void UpdateBoardRootPose()
-    {
-        if (boardRoot == null)
-        {
-            Debug.LogError("boardRoot is null");
-            return;
-        }
-
-        // Planeが選択されていない場合は非表示
-        if (selectedPlane == null)
-        {
-            boardRoot.gameObject.SetActive(false);
-            boundaryPoints.Clear();
-            return;
-        }
-
-        // 選択中のPlaneの位置と回転を取得
-        Transform planeTransform = selectedPlane.transform;
-
-        boardRoot.SetPositionAndRotation(
-            planeTransform.position,
-            planeTransform.rotation
-        );
-
-        // BoardRootを有効化
-        boardRoot.gameObject.SetActive(true);
-
-        UpdateTowerPosition();
-
-        UpdateBoundaryPoints();
-    }
-
-    /// <summary>
-    /// マーカーの位置をBoardRoot基準に変換し、タワーの配置位置を更新する
-    /// </summary>
-    void UpdateTowerPosition()
-    {
-        if (boardRoot == null || towerRoot == null || markerTransform == null)
-        {
-            return;
-        }
-
-        // マーカーのワールド座標をBoardRootのローカル座標に変換
-        Vector3 localPosition = boardRoot.InverseTransformPoint(markerTransform.position);
-
-        // タワーの高さをBoardRootの原点と同じ高さにする
-        localPosition.y = 0f;
-
-        towerRoot.localPosition = localPosition;
-    }
-
-    /// <summary>
-    /// 選択中のPlaneの境界を取得し、BoardRoot基準の座標で保存する
-    /// </summary>
-    void UpdateBoundaryPoints()
-    {
-        // 前回の境界情報をクリア
-        boundaryPoints.Clear();
-
-        if (selectedPlane == null || boardRoot == null)
-        {
-            return;
-        }
-
-        // Planeの境界頂点を取得
-        var boundary = selectedPlane.boundary;
-
-        // 多角形を構成できない場合は終了
-        if (boundary.Length < 3)
-        {
-            return;
-        }
-
-        foreach (Vector2 point in boundary)
-        {
-            // Planeローカル座標からワールド座標に変換
-            Vector3 worldPoint = selectedPlane.transform.TransformPoint(new Vector3(point.x, 0f, point.y));
-
-            // ワールド座標からBoardRootローカル座標に変換
-            Vector3 localPoint = boardRoot.InverseTransformPoint(worldPoint);
-
-            boundaryPoints.Add(localPoint);
-        }
-
-        DrawBoundaryLine();
-    }
-
-    public void DrawBoundaryLine()
-    {
-        if (boundaryLine == null)
-        {
-            return;
-        }
-
-        if (boundaryPoints.Count < 3)
-        {
-            boundaryLine.positionCount = 0;
-            return;
-        }
-
-        // BoardRoot基準の座標をワールド座標に変換
-        Vector3[] worldPoints = new Vector3[boundaryPoints.Count];
-
-        for (int i = 0; i < boundaryPoints.Count; i++)
-        {
-            worldPoints[i] = boardRoot.TransformPoint(boundaryPoints[i]);
-        }
-
-        boundaryLine.useWorldSpace = true;
-        boundaryLine.loop = true;
-        boundaryLine.positionCount = worldPoints.Length;
-        boundaryLine.SetPositions(worldPoints);
-
-        boundaryLine.enabled = true;
     }
 }

@@ -239,6 +239,56 @@ Transform:
   - {fileID: 747994997}
   m_Father: {fileID: 35221153}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &183813684
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 183813685}
+  - component: {fileID: 183813686}
+  m_Layer: 0
+  m_Name: StageManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &183813685
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183813684}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &183813686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183813684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 074ee262ca6a85e4491e4884b29b134c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageManager
+  planeManager: {fileID: 35221155}
+  lineRenderer: {fileID: 1869495499}
+  boardRoot: {fileID: 342044406}
+  towerRoot: {fileID: 1287564591}
+  markerTracking: {fileID: 643893573}
+  boundaryPlaneManager: {fileID: 530827635}
 --- !u!1 &342044405
 GameObject:
   m_ObjectHideFlags: 0
@@ -268,6 +318,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1869495498}
   - {fileID: 1698022063}
   - {fileID: 2030968575}
   m_Father: {fileID: 35221153}
@@ -301,8 +352,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1869495498}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &530827635
@@ -318,10 +368,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoundaryPlaneManager
   planeManager: {fileID: 35221155}
-  boundaryLine: {fileID: 1869495499}
-  boardRoot: {fileID: 342044406}
-  towerRoot: {fileID: 1287564591}
   maxPlaneDistance: 0.05
+  markerTracking: {fileID: 643893573}
 --- !u!1 &643893571
 GameObject:
   m_ObjectHideFlags: 0
@@ -369,7 +417,6 @@ MonoBehaviour:
   trackedImageManager: {fileID: 35221156}
   trackedImagePrefab: {fileID: 3807798677121017685, guid: 7fb75e48e4d51554bbf74c151190bf3f, type: 3}
   towerRoot: {fileID: 1287564591}
-  boundaryPlaneManager: {fileID: 530827635}
 --- !u!1 &747994996
 GameObject:
   m_ObjectHideFlags: 0
@@ -866,12 +913,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1869495497}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 530827633}
+  m_Father: {fileID: 342044406}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &1869495499
 LineRenderer:
@@ -1150,5 +1197,6 @@ SceneRoots:
   - {fileID: 35221153}
   - {fileID: 1964602100}
   - {fileID: 530827633}
+  - {fileID: 183813685}
   - {fileID: 643893572}
   - {fileID: 1253368020}
