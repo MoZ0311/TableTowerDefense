@@ -13,6 +13,9 @@ public class MarkerTracking : MonoBehaviour
     [Header("Prefabs")]
     [SerializeField] GameObject trackedImagePrefab; // マーカー検出時に生成するPrefab
 
+    [Header("Root")]
+    [SerializeField] Transform towerRoot;
+
     [Header("Scripts")]
     [SerializeField] BoundaryPlaneManager boundaryPlaneManager;
 
@@ -21,13 +24,19 @@ public class MarkerTracking : MonoBehaviour
     void OnEnable()
     {
         // 画像検出時のイベント購読
-        trackedImageManager.trackablesChanged.AddListener(OnImageChanged);
+        if (trackedImageManager != null)
+        {
+            trackedImageManager.trackablesChanged.AddListener(OnImageChanged);
+        }
     }
 
     void OnDisable()
     {
         //イベント購読の解除
-        trackedImageManager.trackablesChanged.RemoveListener(OnImageChanged);
+        if (trackedImageManager != null)
+        {
+            trackedImageManager.trackablesChanged.RemoveListener(OnImageChanged);
+        }
     }
 
     /// <summary>
@@ -81,7 +90,7 @@ public class MarkerTracking : MonoBehaviour
         // 一度も生成されていなければ、Prefabを生成
         if (prefabTransform == null)
         {
-            prefabTransform = Instantiate(trackedImagePrefab).transform;
+            prefabTransform = Instantiate(trackedImagePrefab, towerRoot).transform;
         }
 
         prefabTransform.SetPositionAndRotation(

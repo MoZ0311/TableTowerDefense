@@ -1,12 +1,17 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using System.Collections.Generic;
 
 public class BoundaryPlaneManager : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] ARPlaneManager planeManager;
-    [SerializeField] LineRenderer fixedBoundaryLine;
+    [SerializeField] LineRenderer boundaryLine;
+
+    [Header("Root")]
+    [SerializeField] Transform boardRoot;
+    [SerializeField] Transform towerRoot;
 
     [Header("Settings")]
     [SerializeField] float maxPlaneDistance;
@@ -14,9 +19,29 @@ public class BoundaryPlaneManager : MonoBehaviour
     Transform markerTransform;  // 認識したマーカーのTransform情報
     ARPlane selectedPlane;      // 描画対象である、マーカーを内包するPlane
 
-    void Start()
+    readonly List<Vector3> boundaryPoints = new();   // BoardRootを基準としたステージ境界の頂点
+
+    void OnEnable()
     {
-        fixedBoundaryLine.enabled = false;
+        // プレーン変動時のイベント追加
+        if (planeManager != null)
+        {
+            planeManager.trackablesChanged.AddListener(OnPlaneChanged);
+        }
+    }
+
+    void OnDisable()
+    {
+        // プレーン変動時のイベント解除
+        if (planeManager != null)
+        {
+            planeManager.trackablesChanged.RemoveListener(OnPlaneChanged);
+        }
+    }
+
+    void OnPlaneChanged(ARTrackablesChangedEventArgs<ARPlane> changes)
+    {
+        UpdateSelectedPlane();
     }
 
     /// <summary>
@@ -36,6 +61,7 @@ public class BoundaryPlaneManager : MonoBehaviour
     {
         selectedPlane = FindCandidatePlane();
         UpdatePlaneVisibility();
+        UpdateBoardRootPose();
     }
 
     /// <summary>
@@ -45,9 +71,14 @@ public class BoundaryPlaneManager : MonoBehaviour
     ARPlane FindCandidatePlane()
     {
         // nullチェック
-        if (planeManager == null || markerTransform == null)
+        if (planeManager == null)
         {
             Debug.LogError("planeManager is null");
+            return null;
+        }
+        else if (markerTransform == null)
+        {
+            Debug.LogWarning("markerTransform is null");
             return null;
         }
 
@@ -151,5 +182,124 @@ public class BoundaryPlaneManager : MonoBehaviour
                 visualizer.enabled = plane == selectedPlane;
             }
         }
+    }
+
+    /// <summary>
+    /// 選択中のPlaneに合わせてBoardRootの位置と回転を更新する
+    /// </summary>
+    void UpdateBoardRootPose()
+    {
+        if (boardRoot == null)
+        {
+            Debug.LogError("boardRoot is null");
+            return;
+        }
+
+        // Planeが選択されていない場合は非表示
+        if (selectedPlane == null)
+        {
+            boardRoot.gameObject.SetActive(false);
+            boundaryPoints.Clear();
+            return;
+        }
+
+        // 選択中のPlaneの位置と回転を取得
+        Transform planeTransform = selectedPlane.transform;
+
+        boardRoot.SetPositionAndRotation(
+            planeTransform.position,
+            planeTransform.rotation
+        );
+
+        // BoardRootを有効化
+        boardRoot.gameObject.SetActive(true);
+
+        UpdateTowerPosition();
+
+        UpdateBoundaryPoints();
+    }
+
+    /// <summary>
+    /// マーカーの位置をBoardRoot基準に変換し、タワーの配置位置を更新する
+    /// </summary>
+    void UpdateTowerPosition()
+    {
+        if (boardRoot == null || towerRoot == null || markerTransform == null)
+        {
+            return;
+        }
+
+        // マーカーのワールド座標をBoardRootのローカル座標に変換
+        Vector3 localPosition = boardRoot.InverseTransformPoint(markerTransform.position);
+
+        // タワーの高さをBoardRootの原点と同じ高さにする
+        localPosition.y = 0f;
+
+        towerRoot.localPosition = localPosition;
+    }
+
+    /// <summary>
+    /// 選択中のPlaneの境界を取得し、BoardRoot基準の座標で保存する
+    /// </summary>
+    void UpdateBoundaryPoints()
+    {
+        // 前回の境界情報をクリア
+        boundaryPoints.Clear();
+
+        if (selectedPlane == null || boardRoot == null)
+        {
+            return;
+        }
+
+        // Planeの境界頂点を取得
+        var boundary = selectedPlane.boundary;
+
+        // 多角形を構成できない場合は終了
+        if (boundary.Length < 3)
+        {
+            return;
+        }
+
+        foreach (Vector2 point in boundary)
+        {
+            // Planeローカル座標からワールド座標に変換
+            Vector3 worldPoint = selectedPlane.transform.TransformPoint(new Vector3(point.x, 0f, point.y));
+
+            // ワールド座標からBoardRootローカル座標に変換
+            Vector3 localPoint = boardRoot.InverseTransformPoint(worldPoint);
+
+            boundaryPoints.Add(localPoint);
+        }
+
+        DrawBoundaryLine();
+    }
+
+    public void DrawBoundaryLine()
+    {
+        if (boundaryLine == null)
+        {
+            return;
+        }
+
+        if (boundaryPoints.Count < 3)
+        {
+            boundaryLine.positionCount = 0;
+            return;
+        }
+
+        // BoardRoot基準の座標をワールド座標に変換
+        Vector3[] worldPoints = new Vector3[boundaryPoints.Count];
+
+        for (int i = 0; i < boundaryPoints.Count; i++)
+        {
+            worldPoints[i] = boardRoot.TransformPoint(boundaryPoints[i]);
+        }
+
+        boundaryLine.useWorldSpace = true;
+        boundaryLine.loop = true;
+        boundaryLine.positionCount = worldPoints.Length;
+        boundaryLine.SetPositions(worldPoints);
+
+        boundaryLine.enabled = true;
     }
 }
