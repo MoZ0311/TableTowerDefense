@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using System;
 
 /// <summary>
 /// 画像マーカーを検出し、その位置にプレハブを生成するクラス
@@ -13,27 +14,27 @@ public class MarkerTracking : MonoBehaviour
     [Header("Prefabs")]
     [SerializeField] GameObject trackedImagePrefab; // マーカー検出時に生成するPrefab
 
-    [Header("Root")]
-    [SerializeField] Transform towerRoot;
-
+    public event Action<ARTrackedImage> MarkerUpdate;
     public Transform MarkerTransform { get; private set; }
 
     Transform prefabTransform;                      // 生成したPrefabのTransform情報
 
     void OnEnable()
     {
-        // 画像検出時のイベント購読
+        // 画像検出時のイベント追加
         if (trackedImageManager != null)
         {
+            trackedImageManager.enabled = true;
             trackedImageManager.trackablesChanged.AddListener(OnImageChanged);
         }
     }
 
     void OnDisable()
     {
-        //イベント購読の解除
+        // 画像検出時のイベント解除
         if (trackedImageManager != null)
         {
+            trackedImageManager.enabled = false;
             trackedImageManager.trackablesChanged.RemoveListener(OnImageChanged);
         }
     }
@@ -71,6 +72,9 @@ public class MarkerTracking : MonoBehaviour
 
         MarkerTransform = image.transform;
 
+        // マーカーの更新を通知
+        MarkerUpdate?.Invoke(image);
+
         SetPrefab(image.transform);
     }
 
@@ -83,7 +87,7 @@ public class MarkerTracking : MonoBehaviour
         // 一度も生成されていなければ、Prefabを生成
         if (prefabTransform == null)
         {
-            prefabTransform = Instantiate(trackedImagePrefab, towerRoot).transform;
+            prefabTransform = Instantiate(trackedImagePrefab).transform;
         }
 
         prefabTransform.SetPositionAndRotation(

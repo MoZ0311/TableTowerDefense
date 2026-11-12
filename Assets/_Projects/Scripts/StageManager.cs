@@ -1,6 +1,7 @@
 
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
 using System.Collections.Generic;
 
 /// <summary>
@@ -9,8 +10,6 @@ using System.Collections.Generic;
 public class StageManager : MonoBehaviour
 {
     [Header("Components")]
-    [SerializeField] ARPlaneManager planeManager;
-    [SerializeField] ARTrackedImageManager trackedImageManager;
     [SerializeField] LineRenderer lineRenderer;
 
     [Header("Root")]
@@ -18,65 +17,94 @@ public class StageManager : MonoBehaviour
     [SerializeField] Transform towerRoot;
 
     [Header("Scripts")]
-    [SerializeField] MarkerTracking markerTracking;
     [SerializeField] BoundaryPlaneManager boundaryPlaneManager;
+    [SerializeField] MarkerTracking markerTracking;
 
-    readonly List<Vector3> boundaryPoints = new();      // BoardRootを基準としたステージ境界の頂点
+    public bool CanFinalizeStage { get => boardRoot.gameObject.activeInHierarchy; }
+    public bool HasFinalizedStage { get; private set; }
+
+    readonly List<Vector3> boundaryPoints = new();          // BoardRootを基準としたステージ境界の頂点
+    readonly List<Vector3> finalizedBoundaryPoints = new(); // 確定したステージ境界の頂点情報
 
     void OnEnable()
     {
         // プレーン変動時のイベント追加
-        if (planeManager != null)
+        if (boundaryPlaneManager != null)
         {
-            planeManager.trackablesChanged.AddListener(OnPlaneChanged);
+            boundaryPlaneManager.PlaneUpdate += OnPlaneChanged;
         }
 
         // 画像検出時のイベント購読
-        if (trackedImageManager != null)
+        if (markerTracking != null)
         {
-            trackedImageManager.trackablesChanged.AddListener(OnImageChanged);
+            markerTracking.MarkerUpdate += OnImageChanged;
         }
     }
 
     void OnDisable()
     {
         // プレーン変動時のイベント解除
-        if (planeManager != null)
+        if (boundaryPlaneManager != null)
         {
-            planeManager.trackablesChanged.RemoveListener(OnPlaneChanged);
+            boundaryPlaneManager.PlaneUpdate -= OnPlaneChanged;
         }
 
         //イベント購読の解除
-        if (trackedImageManager != null)
+        if (markerTracking != null)
         {
-            trackedImageManager.trackablesChanged.RemoveListener(OnImageChanged);
+            markerTracking.MarkerUpdate -= OnImageChanged;
         }
     }
 
     /// <summary>
     /// Planeが更新されたときの処理
     /// </summary>
-    void OnPlaneChanged(ARTrackablesChangedEventArgs<ARPlane> changes)
+    void OnPlaneChanged(ARPlane plane)
     {
-        UpdateBoardRootPose(boundaryPlaneManager.SelectedPlane);
-        UpdateBoundaryPoints(boundaryPlaneManager.SelectedPlane);
+        if (plane == null ||
+            plane.trackingState != TrackingState.Tracking)
+        {
+            boundaryPoints.Clear();
+            if (boardRoot != null)
+            {
+                boardRoot.gameObject.SetActive(false);
+            }
+            if (lineRenderer != null)
+            {
+                lineRenderer.positionCount = 0;
+                lineRenderer.enabled = false;
+            }
+            return;
+        }
+
+        UpdateBoardRootPose(plane);
+        UpdateBoundaryPoints(plane);
         UpdateBoundaryLine();
+
+        UpdateTowerPosition();
     }
 
     /// <summary>
     /// 登録されたマーカーの状態が変化した時に呼ばれる処理
     /// </summary>
-    void OnImageChanged(ARTrackablesChangedEventArgs<ARTrackedImage> changes)
+    void OnImageChanged(ARTrackedImage image)
     {
+        if (image == null ||
+            image.trackingState != TrackingState.Tracking)
+        {
+            return;
+        }
+
         UpdateTowerPosition();
     }
 
     /// <summary>
-    /// マーカーの位置をBoardRoot基準に変換し、タワーの配置位置を更新する
+    /// タワー(メインゲームで使う本物)の座標を設定する処理
     /// </summary>
     void UpdateTowerPosition()
     {
-        if (boardRoot == null || towerRoot == null)
+        if (boardRoot == null ||
+            towerRoot == null)
         {
             return;
         }
@@ -86,7 +114,6 @@ public class StageManager : MonoBehaviour
 
         // タワーの高さをBoardRootの原点と同じ高さにする
         localPosition.y = 0f;
-
         towerRoot.localPosition = localPosition;
     }
 
@@ -167,5 +194,21 @@ public class StageManager : MonoBehaviour
         lineRenderer.positionCount = boundaryPoints.Count;
         lineRenderer.SetPositions(boundaryPoints.ToArray());
         lineRenderer.enabled = true;
+    }
+
+    public void FinalizeStage()
+    {
+        if (!CanFinalizeStage || HasFinalizedStage)
+        {
+            return;
+        }
+
+        // 各種認識を切る
+        boundaryPlaneManager.enabled = false;
+        markerTracking.enabled = false;
+
+        // 現在の境界頂点の情報で上書きする
+        finalizedBoundaryPoints.Clear();
+        finalizedBoundaryPoints.AddRange(boundaryPoints);
     }
 }

@@ -1,7 +1,11 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using System;
 
+/// <summary>
+/// ステージの境界を管理するクラス
+/// </summary>
 public class BoundaryPlaneManager : MonoBehaviour
 {
     [Header("Components")]
@@ -13,14 +17,22 @@ public class BoundaryPlaneManager : MonoBehaviour
     [Header("Scripts")]
     [SerializeField] MarkerTracking markerTracking;
 
-    public ARPlane SelectedPlane { get; private set; }  // マーカーを内包するPlane
+    public event Action<ARPlane> PlaneUpdate;
+    ARPlane selectedPlane;  // マーカーを内包するPlane
 
     void OnEnable()
     {
         // プレーン変動時のイベント追加
         if (planeManager != null)
         {
+            planeManager.enabled = true;
             planeManager.trackablesChanged.AddListener(OnPlaneChanged);
+        }
+
+        /// マーカー更新時のイベント追加
+        if (markerTracking != null)
+        {
+            markerTracking.MarkerUpdate += OnMarekerUpdated;
         }
     }
 
@@ -29,14 +41,35 @@ public class BoundaryPlaneManager : MonoBehaviour
         // プレーン変動時のイベント解除
         if (planeManager != null)
         {
+            planeManager.enabled = false;
             planeManager.trackablesChanged.RemoveListener(OnPlaneChanged);
+        }
+
+        // 画像検出時のイベント解除
+        if (markerTracking != null)
+        {
+            markerTracking.MarkerUpdate -= OnMarekerUpdated;
         }
     }
 
     void OnPlaneChanged(ARTrackablesChangedEventArgs<ARPlane> changes)
     {
-        SelectedPlane = FindCandidatePlane();
+        UpdatePlanes();
+    }
+
+    void OnMarekerUpdated(ARTrackedImage image)
+    {
+        UpdatePlanes();
+    }
+
+    void UpdatePlanes()
+    {
+        selectedPlane = FindCandidatePlane();
+
         UpdatePlaneVisibility();
+
+        // Planeの更新を通知
+        PlaneUpdate?.Invoke(selectedPlane);
     }
 
     /// <summary>
@@ -61,8 +94,9 @@ public class BoundaryPlaneManager : MonoBehaviour
 
         foreach (var plane in planeManager.trackables)
         {
-            // 平面が水平上向きでなければ、continue
-            if (plane.alignment != PlaneAlignment.HorizontalUp)
+            // 平面が水平上向きで追跡中でなければ、continue
+            if (plane.alignment != PlaneAlignment.HorizontalUp ||
+                plane.trackingState != TrackingState.Tracking)
             {
                 continue;
             }
@@ -153,7 +187,7 @@ public class BoundaryPlaneManager : MonoBehaviour
             // 表示用コンポーネントを、selectedPlaneとの比較で設定
             if (plane.TryGetComponent<ARPlaneMeshVisualizer>(out var visualizer))
             {
-                visualizer.enabled = plane == SelectedPlane;
+                visualizer.enabled = plane == selectedPlane;
             }
         }
     }

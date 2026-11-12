@@ -9,6 +9,9 @@ public class TableBoundingUIManager : MonoBehaviour
     [Header("Components")]
     [SerializeField] UIDocument tableBoundingUI;
 
+    [Header("Scripts")]
+    [SerializeField] StageManager stageManager;
+
     Button finalizeButton;  // 平面検出終了用のボタン
 
     void OnEnable()
@@ -25,6 +28,11 @@ public class TableBoundingUIManager : MonoBehaviour
     {
         // イベント解除
         RemoveEvent();
+    }
+
+    void Update()
+    {
+        finalizeButton.enabledSelf = stageManager.CanFinalizeStage;
     }
 
     /// <summary>
@@ -65,5 +73,6 @@ public class TableBoundingUIManager : MonoBehaviour
     void OnClickedFinalize()
     {
         Debug.Log("FINALIZE!!");
+        stageManager.FinalizeStage();
     }
 }
