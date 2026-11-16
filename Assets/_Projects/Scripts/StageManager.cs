@@ -16,15 +16,28 @@ public class StageManager : MonoBehaviour
     [SerializeField] Transform boardRoot;
     [SerializeField] Transform towerRoot;
 
+    [Header("Prefabs")]
+    [SerializeField] GameObject towerInGamePrefab;
+
     [Header("Scripts")]
     [SerializeField] BoundaryPlaneManager boundaryPlaneManager;
     [SerializeField] MarkerTracking markerTracking;
+    [SerializeField] StageMeshGenerator stageMeshGenerator;
 
-    public bool CanFinalizeStage { get => boardRoot.gameObject.activeInHierarchy; }
+    public bool CanFinalizeStage
+    {
+        get =>
+        !HasFinalizedStage &&
+        boardRoot.gameObject.activeInHierarchy &&
+        boundaryPoints.Count >= 3;
+    }
     public bool HasFinalizedStage { get; private set; }
 
     readonly List<Vector3> boundaryPoints = new();          // BoardRootを基準としたステージ境界の頂点
     readonly List<Vector3> finalizedBoundaryPoints = new(); // 確定したステージ境界の頂点情報
+    Vector3 finalizedBoardPosition;
+    Quaternion finalizedBoardRotation;
+    Vector3 finalizedTowerPosition;
 
     void OnEnable()
     {
@@ -196,11 +209,11 @@ public class StageManager : MonoBehaviour
         lineRenderer.enabled = true;
     }
 
-    public void FinalizeStage()
+    public bool FinalizeStage()
     {
         if (!CanFinalizeStage || HasFinalizedStage)
         {
-            return;
+            return false;
         }
 
         // 各種認識を切る
@@ -210,5 +223,23 @@ public class StageManager : MonoBehaviour
         // 現在の境界頂点の情報で上書きする
         finalizedBoundaryPoints.Clear();
         finalizedBoundaryPoints.AddRange(boundaryPoints);
+
+        finalizedBoardPosition = boardRoot.position;
+        finalizedBoardRotation = boardRoot.rotation;
+        finalizedTowerPosition = towerRoot.localPosition;
+
+        // 床メッシュ生成
+        if (stageMeshGenerator == null ||
+            !stageMeshGenerator.Generate(finalizedBoundaryPoints))
+        {
+            Debug.LogWarning("Stage mesh generation failed.");
+            return false;
+        }
+
+        Transform inGameTowerTransform = Instantiate(towerInGamePrefab, towerRoot, false).transform;
+        inGameTowerTransform.rotation = markerTracking.MarkerTransform.rotation;
+
+        HasFinalizedStage = true;
+        return true;
     }
 }

@@ -34,8 +34,13 @@ public class MarkerTracking : MonoBehaviour
         // 画像検出時のイベント解除
         if (trackedImageManager != null)
         {
-            trackedImageManager.enabled = false;
             trackedImageManager.trackablesChanged.RemoveListener(OnImageChanged);
+            trackedImageManager.enabled = false;
+        }
+
+        if (prefabTransform != null)
+        {
+            Destroy(prefabTransform.gameObject);
         }
     }
 

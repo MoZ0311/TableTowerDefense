@@ -32,7 +32,9 @@ public class TableBoundingUIManager : MonoBehaviour
 
     void Update()
     {
-        finalizeButton.enabledSelf = stageManager.CanFinalizeStage;
+        bool canFinalize = stageManager.CanFinalizeStage;
+        bool hasFinalize = stageManager.HasFinalizedStage;
+        finalizeButton.SetEnabled(canFinalize && !hasFinalize);
     }
 
     /// <summary>
@@ -73,6 +75,10 @@ public class TableBoundingUIManager : MonoBehaviour
     void OnClickedFinalize()
     {
         Debug.Log("FINALIZE!!");
-        stageManager.FinalizeStage();
+        if (stageManager.FinalizeStage())
+        {
+            tableBoundingUI.enabled = false;
+        }
+
     }
 }

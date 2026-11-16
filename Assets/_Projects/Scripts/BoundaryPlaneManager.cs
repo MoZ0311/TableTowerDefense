@@ -41,8 +41,8 @@ public class BoundaryPlaneManager : MonoBehaviour
         // プレーン変動時のイベント解除
         if (planeManager != null)
         {
-            planeManager.enabled = false;
             planeManager.trackablesChanged.RemoveListener(OnPlaneChanged);
+            planeManager.enabled = false;
         }
 
         // 画像検出時のイベント解除
