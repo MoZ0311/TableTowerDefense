@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using System;
 
 /// <summary>
 /// 画像マーカーを検出し、その位置にプレハブを生成するクラス
@@ -13,18 +14,34 @@ public class MarkerTracking : MonoBehaviour
     [Header("Prefabs")]
     [SerializeField] GameObject trackedImagePrefab; // マーカー検出時に生成するPrefab
 
+    public event Action<ARTrackedImage> MarkerUpdate;
+    public Transform MarkerTransform { get; private set; }
+
     Transform prefabTransform;                      // 生成したPrefabのTransform情報
 
     void OnEnable()
     {
-        // 画像検出時のイベント購読
-        trackedImageManager.trackablesChanged.AddListener(OnImageChanged);
+        // 画像検出時のイベント追加
+        if (trackedImageManager != null)
+        {
+            trackedImageManager.enabled = true;
+            trackedImageManager.trackablesChanged.AddListener(OnImageChanged);
+        }
     }
 
     void OnDisable()
     {
-        //イベント購読の解除
-        trackedImageManager.trackablesChanged.RemoveListener(OnImageChanged);
+        // 画像検出時のイベント解除
+        if (trackedImageManager != null)
+        {
+            trackedImageManager.trackablesChanged.RemoveListener(OnImageChanged);
+            trackedImageManager.enabled = false;
+        }
+
+        if (prefabTransform != null)
+        {
+            Destroy(prefabTransform.gameObject);
+        }
     }
 
     /// <summary>
@@ -36,21 +53,21 @@ public class MarkerTracking : MonoBehaviour
         // 検出時
         foreach (var image in changes.added)
         {
-            SetPrefab(image);
+            UpdateMarker(image);
         }
 
         // 移動時
         foreach (var image in changes.updated)
         {
-            SetPrefab(image);
+            UpdateMarker(image);
         }
     }
 
     /// <summary>
-    /// マーカーに対してPrefabを生成、追従させる処理
+    /// マーカー更新に伴う、平面の更新処理
     /// </summary>
-    /// <param name="image">検出されたマーカー</param>
-    void SetPrefab(ARTrackedImage image)
+    /// /// <param name="image">検出されたマーカー情報</param>
+    void UpdateMarker(ARTrackedImage image)
     {
         // マーカーの追跡中でなければ、return
         if (image.trackingState != TrackingState.Tracking)
@@ -58,6 +75,20 @@ public class MarkerTracking : MonoBehaviour
             return;
         }
 
+        MarkerTransform = image.transform;
+
+        // マーカーの更新を通知
+        MarkerUpdate?.Invoke(image);
+
+        SetPrefab(image.transform);
+    }
+
+    /// <summary>
+    /// マーカーに対してPrefabを生成、追従させる処理
+    /// </summary>
+    /// <param name="markerTransform">検出されたマーカーのTransform</param>
+    void SetPrefab(Transform markerTransform)
+    {
         // 一度も生成されていなければ、Prefabを生成
         if (prefabTransform == null)
         {
@@ -65,8 +96,8 @@ public class MarkerTracking : MonoBehaviour
         }
 
         prefabTransform.SetPositionAndRotation(
-            image.transform.position,
-            image.transform.rotation
+            markerTransform.position,
+            markerTransform.rotation
         );
     }
 }

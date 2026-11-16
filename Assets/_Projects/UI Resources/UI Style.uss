@@ -3,8 +3,8 @@
     height: 180px;
     margin-bottom: 60px;
     font-size: 56px;
-    border-top-left-radius: 40px;
-    border-top-right-radius: 40px;
-    border-bottom-right-radius: 40px;
-    border-bottom-left-radius: 40px;
+    border-radius: 40px;
+    -unity-font-definition: url("project://database/Assets/_Projects/Fonts/x8y12pxDenkiChip.ttf?fileID=12800000&guid=03d054a9a5c71074a996b9363c031c69&type=3#x8y12pxDenkiChip");
+    -unity-text-outline-color: rgb(255, 255, 255);
+    -unity-text-outline-width: 1px;
 }
