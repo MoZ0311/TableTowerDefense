@@ -1,7 +1,6 @@
-using TMPro;
 using UnityEngine;
 
-public class CanonController : MonoBehaviour
+public class CannonController : MonoBehaviour
 {
     [SerializeField] Transform muzzle;
     [SerializeField] Projectile projectilePrefab;
@@ -9,6 +8,10 @@ public class CanonController : MonoBehaviour
 
     public void LaunchProjectile()
     {
+        if (!reticleManager.HasTarget)
+        {
+            return;
+        }
         var projectile = Instantiate(projectilePrefab, muzzle.position, Quaternion.identity);
         projectile.Initialize(reticleManager.AimPosition);
     }
