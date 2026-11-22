@@ -6,9 +6,11 @@ public class CannonController : MonoBehaviour
     [SerializeField] Projectile projectilePrefab;
     [SerializeField] ReticleManager reticleManager;
 
+    public bool CanFire { get => reticleManager.HasTarget; }
+
     public void LaunchProjectile()
     {
-        if (!reticleManager.HasTarget)
+        if (!CanFire)
         {
             return;
         }

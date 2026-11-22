@@ -136,13 +136,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f5b0ff13a1a13e47a08e4edf3e2816d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CannonBall
-  jumpForce: 0.3
   dulation: 0.3
+  damageAmount: 1
   explosionEffect: {fileID: 4771581104023408142, guid: 16a6f356d146e4145bee058402b3c564, type: 3}
   explodeRadius: 0.1
   targetLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
 --- !u!135 &2076693588912461405
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -160,7 +160,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.03
   m_Center: {x: 0, y: 0, z: 0}

@@ -36,9 +36,7 @@ public class TableBoundingUIManager : MonoBehaviour
         {
             return;
         }
-        bool canFinalize = stageManager.CanFinalizeStage;
-        bool hasFinalize = stageManager.HasFinalizedStage;
-        finalizeButton.SetEnabled(canFinalize && !hasFinalize);
+        finalizeButton.SetEnabled(stageManager.CanFinalizeStage);
     }
 
     /// <summary>

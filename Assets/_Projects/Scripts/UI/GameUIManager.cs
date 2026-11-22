@@ -23,6 +23,16 @@ public class GameUIManager : MonoBehaviour
         RemoveEvent();
     }
 
+    void Update()
+    {
+        if (cannonController == null)
+        {
+            return;
+        }
+
+        fireButton.SetEnabled(cannonController.CanFire);
+    }
+
     /// <summary>
     /// イベントの登録処理
     /// </summary>

@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using System.Collections.Generic;
+using System;
 
 /// <summary>
 /// ゲームステージの管理
@@ -16,28 +17,29 @@ public class StageManager : MonoBehaviour
     [SerializeField] Transform boardRoot;
     [SerializeField] Transform towerRoot;
 
-    [Header("Prefabs")]
-    [SerializeField] GameObject towerInGamePrefab;
-
     [Header("Scripts")]
     [SerializeField] BoundaryPlaneManager boundaryPlaneManager;
     [SerializeField] MarkerTracking markerTracking;
     [SerializeField] StageMeshGenerator stageMeshGenerator;
 
+    public Action<Transform> OnStageFinalized;
+
     public bool CanFinalizeStage
     {
         get =>
-        !HasFinalizedStage &&
+        !hasFinalizedStage &&
         boardRoot.gameObject.activeInHierarchy &&
         boundaryPoints.Count >= 3;
     }
-    public bool HasFinalizedStage { get; private set; }
+
+    public IReadOnlyList<Vector3> FinalizedBoundaryPoints => finalizedBoundaryPoints;
 
     readonly List<Vector3> boundaryPoints = new();          // BoardRootを基準としたステージ境界の頂点
     readonly List<Vector3> finalizedBoundaryPoints = new(); // 確定したステージ境界の頂点情報
     Vector3 finalizedBoardPosition;
     Quaternion finalizedBoardRotation;
     Vector3 finalizedTowerPosition;
+    bool hasFinalizedStage;
 
     void OnEnable()
     {
@@ -211,7 +213,7 @@ public class StageManager : MonoBehaviour
 
     public bool FinalizeStage()
     {
-        if (!CanFinalizeStage || HasFinalizedStage)
+        if (!CanFinalizeStage || hasFinalizedStage)
         {
             return false;
         }
@@ -236,10 +238,9 @@ public class StageManager : MonoBehaviour
             return false;
         }
 
-        Transform inGameTowerTransform = Instantiate(towerInGamePrefab, towerRoot, false).transform;
-        inGameTowerTransform.rotation = markerTracking.MarkerTransform.rotation;
+        OnStageFinalized?.Invoke(markerTracking.MarkerTransform);
 
-        HasFinalizedStage = true;
+        hasFinalizedStage = true;
         return true;
     }
 }
