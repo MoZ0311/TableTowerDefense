@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6836985451011184201}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Tower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 8447683473618618604}
   - component: {fileID: 5221114452237229178}
   - component: {fileID: 1580897462792191271}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: citadel_tower_b
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -139,7 +139,7 @@ GameObject:
   - component: {fileID: 2112547870311929934}
   - component: {fileID: 1130438384511779972}
   - component: {fileID: 4194117556627009938}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: SpawnEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}

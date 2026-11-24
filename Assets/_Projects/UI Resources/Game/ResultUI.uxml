@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/_Projects/UI%20Resources/UI%20Style.uss?fileID=7433441132597879392&amp;guid=8489a72aeaefa5242b4771c861ad0af3&amp;type=3#UI Style"/>
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:Label text="ゲームオーバー" name="ResultLabel" style="font-size: 184%; -unity-font-definition: url(&quot;project://database/Assets/_Projects/Fonts/x8y12pxDenkiChip.ttf?fileID=12800000&amp;guid=03d054a9a5c71074a996b9363c031c69&amp;type=3#x8y12pxDenkiChip&quot;); -unity-text-outline-width: 10px; color: rgb(213, 0, 0); -unity-text-outline-color: rgb(0, 0, 0); -unity-font-style: bold; -unity-text-align: middle-center; flex-grow: 0; flex-shrink: 1; margin-top: 16%;"/>
+        <ui:VisualElement style="align-items: center; justify-content: center; flex-grow: 1;">
+            <ui:Button text="タイトル" enabled="true" name="TitleButton" focusable="false" style="height: 13%; font-size: 106%;"/>
+            <ui:Button text="リトライ" enabled="true" name="RetryButton" focusable="false" style="height: 13%; font-size: 106%;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
