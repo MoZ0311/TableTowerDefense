@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.XR.ARFoundation;
 
 /// <summary>
 /// 机の境界取得時のUI管理クラス
@@ -8,17 +9,21 @@ public class TableBoundingUIManager : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] UIDocument tableBoundingUI;
+    [SerializeField] ARSession arSession;
 
     [Header("Scripts")]
+    [SerializeField] MarkerTracking markerTracking;
     [SerializeField] StageManager stageManager;
 
     Button finalizeButton;  // 平面検出終了用のボタン
+    Button resetButton;     // 検出リセット用のボタン
 
     void OnEnable()
     {
         // rootから各UI要素を検索、取得
         var root = tableBoundingUI.rootVisualElement;
-        finalizeButton = root.Q<Button>();
+        finalizeButton = root.Q<Button>("FinalizeButton");
+        resetButton = root.Q<Button>("ResetButton");
 
         // イベント登録
         AddEvent();
@@ -45,7 +50,8 @@ public class TableBoundingUIManager : MonoBehaviour
     void AddEvent()
     {
         // 各VisualElementのnullチェック
-        if (finalizeButton == null)
+        if (finalizeButton == null ||
+            resetButton == null)
         {
             Debug.LogError("VisualElement is null");
             return;
@@ -53,6 +59,7 @@ public class TableBoundingUIManager : MonoBehaviour
 
         // クリック時イベントの登録
         finalizeButton.clicked += OnClickedFinalize;
+        resetButton.clicked += OnClickedReset;
     }
 
     /// <summary>
@@ -61,7 +68,8 @@ public class TableBoundingUIManager : MonoBehaviour
     void RemoveEvent()
     {
         // 各VisualElementのnullチェック
-        if (finalizeButton == null)
+        if (finalizeButton == null ||
+            resetButton == null)
         {
             Debug.LogError("VisualElement is null");
             return;
@@ -69,6 +77,7 @@ public class TableBoundingUIManager : MonoBehaviour
 
         // クリック時イベントの解除
         finalizeButton.clicked -= OnClickedFinalize;
+        resetButton.clicked -= OnClickedReset;
     }
 
     /// <summary>
@@ -81,10 +90,17 @@ public class TableBoundingUIManager : MonoBehaviour
             Debug.LogError("StageManager is null");
             return;
         }
-        else if (stageManager.FinalizeStage())
-        {
-            tableBoundingUI.enabled = false;
-        }
 
+        stageManager.FinalizeStage();
+    }
+
+    /// <summary>
+    /// リセットボタンクリック時、平面検出をやり直すための処理
+    /// </summary>
+    void OnClickedReset()
+    {
+        markerTracking.enabled = false;
+        arSession.Reset();
+        markerTracking.enabled = true;
     }
 }

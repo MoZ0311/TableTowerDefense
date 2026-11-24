@@ -29,8 +29,12 @@ public class CannonBall : Projectile
 
     void OnTriggerEnter(Collider other)
     {
-        cannonBallSequence.Kill();
-        Explode();
+        if (other.TryGetComponent(out Tower tower))
+        {
+            tower.TakeDamage(0);
+            cannonBallSequence.Kill();
+            Explode();
+        }
     }
 
     void ShootCannonBall()

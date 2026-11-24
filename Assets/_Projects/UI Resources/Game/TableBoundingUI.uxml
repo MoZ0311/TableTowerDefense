@@ -1,0 +1,8 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/_Projects/UI%20Resources/UI%20Style.uss?fileID=7433441132597879392&amp;guid=8489a72aeaefa5242b4771c861ad0af3&amp;type=3#UI Style"/>
+    <ui:VisualElement style="flex-grow: 1; flex-direction: column; align-items: center; justify-content: space-between;">
+        <ui:Label text="ステージをスキャン中…" style="font-size: 120%; -unity-font-definition: url(&quot;project://database/Assets/_Projects/Fonts/x8y12pxDenkiChip.ttf?fileID=12800000&amp;guid=03d054a9a5c71074a996b9363c031c69&amp;type=3#x8y12pxDenkiChip&quot;); -unity-text-outline-width: 2px; color: rgb(0, 0, 0); -unity-text-outline-color: rgb(255, 255, 255); top: 8%; -unity-font-style: normal; -unity-text-align: middle-center;"/>
+        <ui:Button text="ステージを確定する" enabled="false" focusable="false" name="FinalizeButton" style="height: 12%; bottom: 8%; margin-bottom: 2px;"/>
+        <ui:Button text="リセット" focusable="false" name="ResetButton" style="position: absolute; width: 18%; height: 6%; right: 1%; top: 0.5%; font-size: 54%; border-top-left-radius: 26px; border-top-right-radius: 26px; border-bottom-right-radius: 26px; border-bottom-left-radius: 26px;"/>
+    </ui:VisualElement>
+</ui:UXML>

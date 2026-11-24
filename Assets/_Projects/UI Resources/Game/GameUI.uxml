@@ -1,0 +1,6 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/_Projects/UI%20Resources/UI%20Style.uss?fileID=7433441132597879392&amp;guid=8489a72aeaefa5242b4771c861ad0af3&amp;type=3#UI Style"/>
+    <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: flex-end;">
+        <ui:Button focusable="false" style="bottom: 6%; border-top-left-radius: 128%; border-top-right-radius: 128%; border-bottom-right-radius: 128%; border-bottom-left-radius: 128%; justify-content: center; background-color: rgb(244, 67, 54); border-top-width: 16px; border-right-width: 16px; border-bottom-width: 16px; border-left-width: 16px; border-left-color: rgb(66, 66, 66); border-right-color: rgb(66, 66, 66); border-top-color: rgb(66, 66, 66); border-bottom-color: rgb(66, 66, 66); aspect-ratio: 1; width: 32%; height: auto; margin-bottom: 2px; background-image: url(&quot;project://database/Assets/_Projects/Images/bomb.png?fileID=2800000&amp;guid=4ccc226a6e30bf6448405bc575135cd5&amp;type=3#bomb&quot;); background-size: 75% 75%; background-position-x: right 30%;"/>
+    </ui:VisualElement>
+</ui:UXML>

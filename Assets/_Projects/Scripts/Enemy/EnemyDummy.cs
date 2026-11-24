@@ -2,13 +2,10 @@ using UnityEngine;
 
 public class EnemyDummy : Enemy
 {
-    [SerializeField] float moveSpeed;
-
-    void Update()
+    [SerializeField] float rotateSpeed;
+    protected override void UpdateAttack()
     {
-        if (moveSpeed != 0)
-        {
-            transform.position = Vector3.Lerp(transform.position, target.position, moveSpeed * Time.deltaTime);
-        }
+        base.UpdateAttack();
+        transform.Rotate(0, rotateSpeed * Time.deltaTime, 0);
     }
 }

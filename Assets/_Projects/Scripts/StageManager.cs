@@ -211,11 +211,11 @@ public class StageManager : MonoBehaviour
         lineRenderer.enabled = true;
     }
 
-    public bool FinalizeStage()
+    public void FinalizeStage()
     {
         if (!CanFinalizeStage || hasFinalizedStage)
         {
-            return false;
+            return;
         }
 
         // 各種認識を切る
@@ -235,12 +235,11 @@ public class StageManager : MonoBehaviour
             !stageMeshGenerator.Generate(finalizedBoundaryPoints))
         {
             Debug.LogWarning("Stage mesh generation failed.");
-            return false;
+            return;
         }
 
         OnStageFinalized?.Invoke(markerTracking.MarkerTransform);
 
         hasFinalizedStage = true;
-        return true;
     }
 }

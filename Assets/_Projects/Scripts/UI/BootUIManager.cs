@@ -1,6 +1,6 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using Scene = SceneChanger.Scene;
 
 /// <summary>
 /// 起動時のUI管理クラス
@@ -77,7 +77,7 @@ public class BootUIManager : MonoBehaviour
     /// </summary>
     void OnClickedPlaneDetection()
     {
-        SceneManager.LoadScene("PlaneDetection");
+        SceneChanger.LoadScene(Scene.Plane);
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public class BootUIManager : MonoBehaviour
     /// </summary>
     void OnClickedImageTrancking()
     {
-        SceneManager.LoadScene("ImageTracking");
+        SceneChanger.LoadScene(Scene.Image);
     }
 
     /// <summary>
@@ -93,6 +93,6 @@ public class BootUIManager : MonoBehaviour
     /// </summary>
     void OnClickedTableBounding()
     {
-        SceneManager.LoadScene("TableBounding");
+        SceneChanger.LoadScene(Scene.Game);
     }
 }
